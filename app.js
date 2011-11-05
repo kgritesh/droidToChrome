@@ -18,11 +18,10 @@ app.get('/', function(req, res){
 });
 
 app.post('/register', function(req, res){
-    console.log(req.headers);
     var data = req.body;
     console.log(data);
     res.contentType('application/json');
-    db_users.view('user/usermap', {key: data.username}, function(err, doc) {
+    db_users.view('users/usermap', {key: data.username}, function(err, doc) {
     if(doc) {
 	console.log(data);
 	res.send({success: false, error: 'User already exists' });
@@ -32,9 +31,14 @@ app.post('/register', function(req, res){
 	data.device_array = []
 	console.log(data.password)
 	db_users.save(data , function(db_users_err, db_users_res) {
-	    req.session.is_authenticated = true;
-	    req.session.user = data.usern;
-	    res.send({success:true});
+	    if(db_users_res.ok){
+		req.session.is_authenticated = true;
+		req.session.user = data.usern;
+		res.send({"success":true, "user_id": db_users_res.id});
+	    }
+	    else{
+		res.send({"success":false, "error": err});
+	    }
       });
     }
   });
@@ -42,7 +46,7 @@ app.post('/register', function(req, res){
 
 app.post("/pc/login", function(req, res){
     var data = req.body;
-    console.log(data);
+    console.log("Input Data" + data);
     res.contentType('application/json');
     db_users.view('users/usermap', {key: data.username}, function(err, docs) {
 	if (docs){
@@ -66,13 +70,40 @@ app.post("/pc/login", function(req, res){
                                      console.log(res);
 		        });
 			device_row = {"user_id": doc._id, "device": device_name}
-			//db_devices.save(device_row, pc_auth);
-
+			db_devices.save(device_row, function(err, resp){
+			    console.log(resp);
+			    if(resp.ok){
+				req.session.is_authenticated = true;
+				req.session.username = data.username;
+				res.send({"success":true, "uuid": resp.id});
+				console.log("Created New Device");
+			    }
+			    else{
+				req.session.is_authenticated = false;
+				res.send({"success":false, "error": err});
+				console.log("Unable to Save New Device");
+			    }
+			});
                     }
-		    req.session.is_authenticated = true;
-		    req.session.username = data.username;
-		    res.send({"success":true, "uuid": doc._id});
-		    console.log("Success True");
+		    else{
+			var dev_key = doc._id + "$" + device_name;
+			console.log(dev_key);
+			db_devices.view('devices/devicemap', {key: dev_key},
+                        function(err, docs) {
+			    if(docs){
+				doc = docs[0].value;
+				req.session.is_authenticated = true;
+				req.session.username = data.username;
+				res.send({"success":true, "uuid": doc._id});
+				console.log("Returned Existing device");
+			    }
+			    else{
+				req.session.is_authenticated = false;
+				res.send({"success":false, "error": err});
+				console.log("Success False");
+			    }
+			});
+		    }
 		}
 		else{
 		    req.session.is_authenticated = false;
@@ -100,7 +131,7 @@ app.post('/login', function(req, res){
 		if(match){
 		    req.session.is_authenticated = true;
 		    req.session.username = data.username;
-		    res.send({success:true});
+		    res.send({"success":true, "user_id": doc._id});
 		}
 		else{
 		    req.session.is_authenticated = false;
@@ -116,15 +147,33 @@ app.post('/login', function(req, res){
 });
 
 
+app.post("/get_devices", function(req, res){
+    user_id  = req.body.user_id;
+    db_users.get(user_id, function(err, doc){
+	if(doc){
+	    res.send({"success": true, "devices": doc.device_array});
+	}
+	else{
+	    res.send({success: false, error: "User ID Doesn't exist. Please Login "});
+	}
+    })
+});
+
+
 app.post('/share', function(req, res){
-    //if(req.session.is_authenticated){
-        username = req.body.username;
-	link = req.body.url;
-	socket = sockets_hash[username];
-        socket.emit("urls", {"url" : link});
-    console.log(socket);
-        res.send({success:true});
-    //}
+    key = req.body.user_id + "$" + "pc";
+    console.log(key);
+    link = req.body.url;
+    console.log(link)
+    socket = sockets_hash[key];
+    if(socket){
+	socket.emit("urls", {"url" : link});
+	console.log("Emitted Link");
+	res.send({"success":true});
+    }
+    else{
+	res.send({"success":false});
+    }
 });
 
 function verify_password(password, hash, callable){
@@ -155,13 +204,21 @@ sockets_hash = {}
 
 io.sockets.on('connection', function (socket) {
   socket.on('auth', function (data) {
+      console.log("Inside Sockets");
       console.log(data);
       uuid = data.uuid;
       device_name = data.device_name;
-      db_users.get(uuid, function(err, doc){
-	  username = doc.username
+      db_devices.get(uuid, function(err, doc){
+	  if(doc){
+	      var key = doc.user_id + "$" + doc.device;
+	      console.log("Socket Key is " + key);
+	      sockets_hash[key] = socket;
+	  }
+	  else{
+	      socket.emit("error", {"error": "The device is not authorized"});
+	  }
+
       });
-      console.log(data);
   });
 });
 
