@@ -19,11 +19,12 @@ app.get('/', function(req, res){
 
 app.post('/register', function(req, res){
     var data = req.body;
-    console.log(data);
+    console.log("Registration Json Data");
+    console.log("data");
     res.contentType('application/json');
-    db_users.view('users/usermap', {key: data.username}, function(err, doc) {
-    if(doc) {
-	console.log(data);
+    db_users.view('users/usermap', {key: data.username}, function(err, docs) {
+      if(docs.length > 0) {
+	console.log("User Already Exists. Registration Failed");
 	res.send({success: false, error: 'User already exists' });
     } else {
 	delete data.confirm_password;
@@ -34,9 +35,11 @@ app.post('/register', function(req, res){
 	    if(db_users_res.ok){
 		req.session.is_authenticated = true;
 		req.session.user = data.usern;
+		console.log("User Registered " + db_users_res.id);
 		res.send({"success":true, "user_id": db_users_res.id});
 	    }
 	    else{
+		console.log("User Registeration Failed " + err);
 		res.send({"success":false, "error": err});
 	    }
       });
@@ -46,10 +49,12 @@ app.post('/register', function(req, res){
 
 app.post("/pc/login", function(req, res){
     var data = req.body;
-    console.log("Input Data" + data);
+    console.log("PC Login");
+    console.log(data);
     res.contentType('application/json');
     db_users.view('users/usermap', {key: data.username}, function(err, docs) {
-	if (docs){
+	console.log(docs);
+	if (docs.length > 0){
 	    doc = docs[0].value;
 	    password = doc.password;
 	    console.log(doc);
@@ -90,7 +95,7 @@ app.post("/pc/login", function(req, res){
 			console.log(dev_key);
 			db_devices.view('devices/devicemap', {key: dev_key},
                         function(err, docs) {
-			    if(docs){
+			    if(docs.length > 0){
 				doc = docs[0].value;
 				req.session.is_authenticated = true;
 				req.session.username = data.username;
@@ -101,6 +106,7 @@ app.post("/pc/login", function(req, res){
 				req.session.is_authenticated = false;
 				res.send({"success":false, "error": err});
 				console.log("Success False");
+				console.log(err);
 			    }
 			});
 		    }
@@ -124,7 +130,7 @@ app.post('/login', function(req, res){
     console.log(data);
     res.contentType('json');
     db_users.view('users/usermap', {key: data.username}, function(err, docs) {
-	if (docs){
+	if (docs.length > 0){
 	    doc = docs[0].value;
 	    password = doc.password;
 	    verify_password(data.password, password, function(match){
@@ -140,8 +146,19 @@ app.post('/login', function(req, res){
 	    });
 	}
 	else{
-	    //req.sessions.is_authenticated = false
-	    res.send({success: false, error: "Username Doesn't Exist"});
+	    data.password = converthash(data.password, randomString(10));
+	    data.device_array = []
+	    console.log(data.password)
+	    db_users.save(data , function(db_users_err, db_users_res) {
+		if(db_users_res.ok){
+		    req.session.is_authenticated = true;
+		    req.session.user = data.usern;
+		    res.send({"success":true, "user_id": db_users_res.id});
+		}
+		else{
+		    res.send({"success":false, "error": err});
+		}
+	    });
 	}
     });
 });
@@ -161,7 +178,8 @@ app.post("/get_devices", function(req, res){
 
 
 app.post('/share', function(req, res){
-    key = req.body.user_id + "$" + "pc";
+    device_name = req.body.device_name
+    key = req.body.user_id + "$" + device_name;
     console.log(key);
     link = req.body.url;
     console.log(link)
@@ -212,6 +230,10 @@ io.sockets.on('connection', function (socket) {
 	  if(doc){
 	      var key = doc.user_id + "$" + doc.device;
 	      console.log("Socket Key is " + key);
+	      if(sockets_hash[key]){
+		  console.log("Closing old socket");
+		  sockets_hash[key].emit("disconnect");
+	      }
 	      sockets_hash[key] = socket;
 	  }
 	  else{
