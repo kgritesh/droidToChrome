@@ -1,0 +1,152 @@
+<html>
+<head>
+<title>DroidtoPhoneExtension</title>
+<link rel="stylesheet" type="text/css" href="css/login.css" />
+<script type="text/javascript" src="js/socketcom.js"></script>
+<script src="socket.io.js"></script>
+<style>
+<style>
+	body{
+		font-family:Arial, Helvetica, sans-serif;
+		font-size: 13px;
+	}
+	.content, .contentA{
+		padding:70px;
+		width:370px
+	}
+	.left{
+		width:150px;
+		float:left;
+		padding:7px 0px 0px 7px;
+		min-height:24px;
+	}
+	.right{
+		width:200px;
+		float:left;
+		padding:5px;
+		min-height:24px;
+	}
+	.clear{
+		float:none;
+		clear:both;
+		height:0px;
+	}
+	.row{
+		background-color:none;
+		display:block;
+		min-height:32px;
+	}
+	.text{
+		width:190px;
+	}
+     img.left{
+          position : absolute;
+	  left :-30px;
+         width: 150px;
+         top:20px;
+	}
+     img.right{
+		position : absolute;
+                top : 0px;
+                left : 400px;
+	}
+    p.title
+     {
+       font-size: 30px;
+       position : absolute;
+       text-align : center;
+       top : 10 px;
+       left : 130px;
+     }
+}
+
+</style>
+<script type="text/javascript">
+ function authenticate()
+ {
+   var xhr = new XMLHttpRequest();
+   console.log("sending request");
+   var userName = document.getElementById('username').value;
+   var password = document.getElementById('password').value;
+   var  deviceName = document.getElementById('device_name').value;
+    
+   if(userName===null || userName==="" || password===null || password==="" || deviceName===null || deviceName==="")
+   {
+          document.getElementById("status_message").innerHTML="Please fill all details";
+          document.getElementById("status_message").style.visibility="visible"; 
+          return false;
+   }
+
+   var paramJSON = '{ "username":"'+userName+'","password":"'+password+'","device_name":"'+deviceName+'"}';
+   xhr.open("POST","http://192.168.43.248:8080/pc/login",true);
+   xhr.setRequestHeader("Content-type", "application/json");
+   xhr.onreadystatechange=function()
+  {
+  if (xhr.readyState==4 && xhr.status==200)
+    {
+     var resJson = JSON.parse(xhr.responseText);
+     if(resJson.success===true)
+       {
+     console.log(xhr.responseText);
+    document.getElementById("status_message").innerHTML="U are done. You can close this tab";
+     document.getElementById("status_message").style.visibility="visible";
+     window.localStorage.setItem("uuid", resJson.uuid);
+      run();
+      }
+     else
+        {
+          document.getElementById("status_message").innerHTML=resJson.error;
+          document.getElementById("status_message").style.visibility="visible";
+       }
+ 
+ 
+    }
+    else
+     {
+        document.getElementById("status_message").innerHTML="U are having problem connecting to server";
+          document.getElementById("status_message").style.visibility="visible";
+     }
+  }
+xhr.send(paramJSON);
+return false;
+ }
+
+</script>
+</head>
+<body>
+  <img src="img/androidt.png" class="left" />
+    <img src="img/chrome11.png" class="right" />
+ <form class="login_form" onsubmit="return authenticate();"> 
+   
+     <div class="content">
+     <div class="row">
+         <p class="title">Droid&nbsp;To&nbsp;Chrome </p>
+    </div>
+     <fieldset>
+        <legend>Login info</legend>
+     <div class="row">
+			<div class="left">Username</div>
+			<div class="right"><input id="username" name="username" type="text" class="text" /></div>
+			<div class="clear"></div>
+		</div>
+		<div class="row">
+			<div class="left">Password</div>
+			<div class="right"><input name="password" type="password" class="text" id="password" /></div>
+			<div class="clear"></div>
+		</div>
+		<div class="row">
+			<div class="left">Device Name</div>
+			<div class="right"><input name="device_name" type="text" class="text" id="device_name"/></div>
+			<div class="clear"></div>
+		</div>
+		<div class="row">
+			<div class="right"><input name="submit" value="Login" type="submit" class="text" /></div>
+			<div class="clear"></div>
+		</div>
+       </fieldset>
+      </div>
+ </form>
+ <div class="status_message" id="status_message" style="visibility:hidden" ></div>
+ <hr>
+</body>
+</html>

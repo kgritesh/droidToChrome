@@ -1,0 +1,46 @@
+<html>
+<head>
+ <script type="text/javascript">
+  function logoutAndClear()
+    {
+      window.localStorage.removeItem('uuid');
+      document.getElementById('login_button').style.visibility='visible';
+      document.getElementById('logout_button').style.visibility='hidden';
+   }
+    function login()
+    {
+      document.location="login.html";
+   }
+</script>
+</head>
+<body>
+ <form>
+ <input type="button" id="logout_button" name="logout" value="logout" onclick='logoutAndClear()' style="visibility:hidden" />
+  <input type="button" id="login_button" name="login_button" value="Login" onclick='login()' style="visibility:hidden" />
+</form>
+ <script type="text/javascript">
+ try
+{  
+var uuid = window.localStorage.getItem('uuid');
+console.log(uuid);
+if(uuid===null)
+ {
+   document.getElementById('login_button').style.visibility='visible';
+   
+ }
+else
+{
+document.getElementById('logout_button').style.visibility='visible';
+ }
+}
+catch(e)
+{
+ document.getElementById('login_button').style.visibility='visible';
+document.getElementById('logout_button').style.visibility='hidden';
+ console.log(e);
+}
+
+</script>
+
+</body>
+</html>
