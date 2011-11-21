@@ -1,22 +1,45 @@
+//Variables Declaration
+
 var express = require('express'),
-    cradle = require('cradle');
+app = express.createServer(),
+cradle = require('cradle'),
+constants = require('./constants'),
+conn = new(cradle.Connection)(constants.COUCH_SERVER, constants.COUCH_PORT ,
+			      {cache: true}),
+db_users = conn.database('users'),
+db_devices = conn.database('devices'),
+crypto = require('crypto')
+io = require('socket.io').listen(app),
+dbhelper = require('./db_helper'),
+couch_views = require('./couch_views');
 
-var app = express.createServer();
-var conn = new(cradle.Connection)("http://localhost", 5984, {cache: true});
-var db_users = conn.database('users');
-var db_devices = conn.database('devices');
-var crypto = require('crypto');
-var io = require('socket.io').listen(app);
-
-app.use(express.logger());
-app.use(express.bodyParser());
-app.use(express.cookieParser());
-app.use(express.session({ secret: "droidToChromeRMR" }));
-
-app.get('/', function(req, res){
-    res.send("Hello World");
+//Common configuration for all environments
+app.configure(function(){
+    app.use(express.logger());
+    app.use(express.bodyParser());
+    app.use(express.cookieParser());
+    app.use(express.session({ secret: constants.SECRET }));
 });
 
+app.configure('development', function(){
+  app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
+});
+
+app.configure('production', function(){
+  app.use(express.errorHandler());
+});
+
+//Create DB, design docs and views if not exists
+dbhelper.create_db(db_users, couch_views.users_design_doc);
+dbhelper.create_db(db_devices, couch_views.devices_design_doc);
+
+
+// Routes
+app.get('/', function(req, res){
+    res.send("Currently This Api is Not Supported");
+});
+
+//Register A New User
 app.post('/register', function(req, res){
     var data = req.body;
     console.log("Registration Json Data");
