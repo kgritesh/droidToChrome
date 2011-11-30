@@ -30,9 +30,9 @@ exports.get_uuid= function(user_id, device_name) {
 };
 
 /*
-A utility function to send response for all the user auth type requests. In case
-of error send the error message, else stores user auth details in session and
-respond with user id
+A utility function to send response for all the requests. In case of
+error send the error message, else send the appropriate response as
+the attribute of the response object
 */
 exports.sendUserAuthResponse = function(errordic, response)
   res.contentType('application/json');

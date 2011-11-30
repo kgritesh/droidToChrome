@@ -36,8 +36,11 @@ exports.register = function(username, password, done){
 	    done(null, {user_id: db_users_res.id});
 	  }
 	  else{
+	    var errmsg = "Error while registering a new user " + username \
+	      + " " + err;
+
 	    console.log("Error while registering a new user " + username, err);
-	    done(err);
+	    done(errmsg);
 	  }
       });
     }
@@ -56,7 +59,7 @@ exports.login = function(username, password, done){
       utils.verify_password(password, doc.password, function(flag){
 	if (flag){
 	  console.log("Password Matched. User " + username + " is logged in");
-	  done(null, doc);
+	  done(null, {user_id: doc.id});
 	}
 	else {
 	  var errmsg = "Invalid Username/Password";
@@ -89,8 +92,9 @@ exports.findOrAddDevice  = function(doc, devicename, done){
 	devices.findOrAddDevice(doc._id, device_name, done);
       }
       else {
+	var errmsg = "Error while saving device " + device_name + " " + err;
 	console.log("Error while saving device " + device_name, err);
-	done(err, null);
+	done(errmsg, null);
       }
 
     });
