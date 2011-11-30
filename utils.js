@@ -34,12 +34,14 @@ A utility function to send response for all the requests. In case of
 error send the error message, else send the appropriate response as
 the attribute of the response object
 */
-exports.sendUserAuthResponse = function(errordic, response)
-  res.contentType('application/json');
-  if(err)
-    res.send({"success":false, "error": err});
-  else {
-    res.send({"success":false, "response": response});
-  }
-});
-
+exports.sendUserAuthResponse = function(res){
+  var send = function(errodic, response){
+    res.contentType('application/json');
+    if(err)
+      res.send({"success":false, "error": err});
+    else {
+      res.send({"success":false, "response": response});
+    }
+  };
+  return send;
+};

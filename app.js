@@ -5,7 +5,6 @@ cradle = require('cradle'),
 constants = require('./constants'),
 users = require('./models/users'),
 devices = require('./models/devices')
-db_devices = conn.database('devices'),
 sockethelper = require('./socket_helper');
 dbhelper = require('./db_helper'),
 utils = require('./utils');
@@ -58,7 +57,8 @@ app.get('/', function(req, res){
 app.post('/register', function(req, res){
   var data = req.body;
   console.log("Registeration Request", data);
-  users.registerUser(data.username, data.password, utils.sendUserAuthResponse);
+  users.registerUser(data.username, data.password,
+		     utils.sendUserAuthResponse(res));
 });
 
 /*
@@ -77,7 +77,8 @@ app.post("/login/extension/", function(req, res){
     else{
       //Find or add a new device with the provided device name. Respond with the
       //device id of the device from the device table
-      user.findOrAddDevice(doc, data.device_name, utils.sendUserAuthResponse);
+      user.findOrAddDevice(doc, data.device_name,
+			   utils.sendUserAuthResponse(res));
     }
   });
 });
@@ -89,7 +90,7 @@ app.post('/login/mobile', function(req, res){
   var data = req.body;
   console.log("Extensions Login ", data);
   //verify user credentials
-  user.login(data.username, data.password , utils.sendUserAuthResponse);
+  user.login(data.username, data.password , utils.sendUserAuthResponse(res));
 });
 
 /*
@@ -97,7 +98,7 @@ A request to get the entire device list
 */
 app.post("/get/devices-list", function(req, res){
   var data = req.body();
-  users.getDevicesList(data.user_id, utils.sendUserAuthResponse);
+  users.getDevicesList(data.user_id, utils.sendUserAuthResponse(res));
 });
 
 /*
@@ -108,7 +109,7 @@ app.post('/share/link', function(req, res){
   key = req.body.user_id + "$" + device_name;
   link = req.body.url;
   console.log("Share the link " + link + " for the socket key " +  key);
-  socket_helper.share_link(key, link, utils.sendUserAuthResponse);
+  socket_helper.share_link(key, link, utils.sendUserAuthResponse(res));
 
 });
 

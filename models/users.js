@@ -5,7 +5,7 @@ conn = new(cradle.Connection)(constants.COUCH_SERVER, constants.COUCH_PORT ,
 db_users = conn.database('users'),
 devices = require('./devices'),
 couch_views = require('../couch_views'),
-dbhelper = require('./db_helper');
+dbhelper = require('../db_helper');
 
 /*Intialize the user model by creating database and views if they don't exists*/
 exports.init = function(){
@@ -36,8 +36,8 @@ exports.register = function(username, password, done){
 	    done(null, {user_id: db_users_res.id});
 	  }
 	  else{
-	    var errmsg = "Error while registering a new user " + username \
-	      + " " + err;
+	    var errmsg = "Error while registering a new user \
+	                 " + username + " " + err;
 
 	    console.log("Error while registering a new user " + username, err);
 	    done(errmsg);

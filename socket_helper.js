@@ -8,7 +8,7 @@ the {user_id+$+device_name: socket} in a hash map, so that when a share request
 comes for that particular user and the device, it is sent across that socket to
 the appropriate device */
 exports.init = function(app){
-  io.listen(app);
+  io = io.listen(app);
   io.sockets.on('connection', function (socket) {
     socket.on('auth', function (data) {
       console.log("Received an authorization request", data);
