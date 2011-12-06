@@ -69,16 +69,16 @@
    var userName = document.getElementById('username').value;
    var password = document.getElementById('password').value;
    var  deviceName = document.getElementById('device_name').value;
-    
+
    if(userName===null || userName==="" || password===null || password==="" || deviceName===null || deviceName==="")
    {
           document.getElementById("status_message").innerHTML="Please fill all details";
-          document.getElementById("status_message").style.visibility="visible"; 
+          document.getElementById("status_message").style.visibility="visible";
           return false;
    }
 
    var paramJSON = '{ "username":"'+userName+'","password":"'+password+'","device_name":"'+deviceName+'"}';
-   xhr.open("POST","http://192.168.43.248:8080/pc/login",true);
+   xhr.open("POST", ipaddress, true);
    xhr.setRequestHeader("Content-type", "application/json");
    xhr.onreadystatechange=function()
   {
@@ -98,8 +98,8 @@
           document.getElementById("status_message").innerHTML=resJson.error;
           document.getElementById("status_message").style.visibility="visible";
        }
- 
- 
+
+
     }
     else
      {
@@ -116,8 +116,8 @@ return false;
 <body>
   <img src="img/androidt.png" class="left" />
     <img src="img/chrome11.png" class="right" />
- <form class="login_form" onsubmit="return authenticate();"> 
-   
+ <form class="login_form" onsubmit="return authenticate();">
+
      <div class="content">
      <div class="row">
          <p class="title">Droid&nbsp;To&nbsp;Chrome </p>

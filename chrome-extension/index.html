@@ -6,10 +6,10 @@
   function init()
    {
     if (localStorage.getItem('first_run'))
-        {
-         run();
-        return; 
-        }
+    {
+      run();
+      return;
+    }
     localStorage.setItem('first_run', 'true');
     chrome.tabs.create({url: "login.html"});
   }
