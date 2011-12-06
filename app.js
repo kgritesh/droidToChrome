@@ -69,15 +69,15 @@ app.post("/login/extension/", function(req, res){
   console.log("Extensions Login ", data);
 
   //verify user credentials
-  user.login(data.username, data.password , function(error, doc){
+  users.login(data.username, data.password , function(error, doc){
     if (error) {
       res.contentType('application/json');
-      res.send({"success":false, "error": err});
+      res.send({"success":false, "error": error});
     }
     else{
       //Find or add a new device with the provided device name. Respond with the
       //device id of the device from the device table
-      user.findOrAddDevice(doc, data.device_name,
+      users.findOrAddDevice(doc, data.device_name,
 			   utils.sendUserAuthResponse(res));
     }
   });
@@ -90,14 +90,22 @@ app.post('/login/mobile', function(req, res){
   var data = req.body;
   console.log("Extensions Login ", data);
   //verify user credentials
-  user.login(data.username, data.password , utils.sendUserAuthResponse(res));
+  users.login(data.username, data.password , function(error, doc){
+    res.contentType('application/json');
+    if (error) {
+      res.send({"success":false, "error": error});
+    }
+    else{
+      res.send({"success":true, "response": {user_id: doc._id} });
+    }
+  });
 });
 
 /*
 A request to get the entire device list
 */
 app.post("/get/devices-list", function(req, res){
-  var data = req.body();
+  var data = req.body;
   users.getDevicesList(data.user_id, utils.sendUserAuthResponse(res));
 });
 
@@ -113,4 +121,4 @@ app.post('/share/link', function(req, res){
 
 });
 
-app.listen(8080);
+app.listen(3000);

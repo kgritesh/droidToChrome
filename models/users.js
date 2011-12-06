@@ -13,7 +13,7 @@ exports.init = function(){
 }
 
 /* A function that initialized user */
-exports.register = function(username, password, done){
+exports.registerUser = function(username, password, done){
   db_users.view('users/usermap', {key: username}, function(err, docs) {
     //Check if user already exists
     if(docs.length > 0) {
@@ -24,7 +24,7 @@ exports.register = function(username, password, done){
     else {
       //Create new password
       var salt = utils.randomString(constants.SALT_LENGTH);
-      password = utils.converthash(password, salt);
+      password = utils.convert_to_hash(password, salt);
       db_users.save({username: username,
 		     password: password,
 		     device_array:[]
@@ -59,7 +59,7 @@ exports.login = function(username, password, done){
       utils.verify_password(password, doc.password, function(flag){
 	if (flag){
 	  console.log("Password Matched. User " + username + " is logged in");
-	  done(null, {user_id: doc.id});
+	  done(null, doc);
 	}
 	else {
 	  var errmsg = "Invalid Username/Password";
@@ -81,14 +81,16 @@ exports.login = function(username, password, done){
 Add the device to the user's device array if it doesn't exists and also add it
 to the device table. Returns the device id in the device table
 */
-exports.findOrAddDevice  = function(doc, devicename, done){
-  device_array = doc.device_array.length > 0 ? doc.device_array : [];
+exports.findOrAddDevice  = function(doc, device_name, done){
+  device_array = doc.device_array ? doc.device_array : [];
   //Check if device already exists
   if(device_array.indexOf(device_name) == -1){
-    //Add a new device to the user as well as the devices table
+    //Add a new device to the device_array for the particular user
     device_array.push(device_name);
-    db_users.merge(doc._id, {"device_array": device_array}, function(err, resp){
+    db_users.merge(doc._id, {device_array: device_array}, function(err, resp){
       if(resp.ok){
+	//Add the new device to the device table and get the corresponding uuid
+	console.log("New Device " + device_name + "  added to the device array");
 	devices.findOrAddDevice(doc._id, device_name, done);
       }
       else {
@@ -98,6 +100,11 @@ exports.findOrAddDevice  = function(doc, devicename, done){
       }
 
     });
+  }
+  else {
+    //The device already exists in the device array
+    //Add the new device to the device table and get the corresponding uuid
+    devices.findOrAddDevice(doc._id, device_name, done);
   }
 }
 

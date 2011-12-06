@@ -1,7 +1,7 @@
 var crypto = require('crypto');
 
-exports.convert_hash = function(text, salt){
-    var hash = crypto.createHmac('sha1', salt).update(text).digest('hex');
+exports.convert_to_hash = function(text, salt){
+  var hash = crypto.createHmac('sha1', salt).update(text).digest('hex');
     return hash + "$" + salt;
 }
 
@@ -18,14 +18,14 @@ exports.randomString = function(len){
 
 exports.verify_password = function (password, hash, callable){
     var salt = hash.split("$")[1];
-    var hash_pass = converthash(password, salt);
+    var hash_pass = exports.convert_to_hash(password, salt);
     if(hash_pass == hash)
 	callable(true)
     else
 	callable(false)
 };
 
-exports.get_uuid= function(user_id, device_name) {
+exports.get_device_id = function(user_id, device_name) {
     return "{0}${1}".format(user_id, device_name);
 };
 
@@ -35,12 +35,12 @@ error send the error message, else send the appropriate response as
 the attribute of the response object
 */
 exports.sendUserAuthResponse = function(res){
-  var send = function(errodic, response){
+  var send = function(err, response){
     res.contentType('application/json');
     if(err)
-      res.send({"success":false, "error": err});
+      res.send({"success": false, "error": err});
     else {
-      res.send({"success":false, "response": response});
+      res.send({"success": true, "response": response});
     }
   };
   return send;
