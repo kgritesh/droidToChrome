@@ -57,8 +57,21 @@ app.get('/', function(req, res){
 app.post('/register', function(req, res){
   var data = req.body;
   console.log("Registeration Request", data);
-  users.registerUser(data.username, data.password,
-		     utils.sendUserAuthResponse(res));
+  var responseFunc = utils.sendUserAuthResponse(res);
+  var errors = [];
+
+  if(!data.username)
+    errors.push("Username cannot be empty");
+
+  if(!data.password)
+    errors.push("Password cannot be empty");
+
+  if(errors.length > 0)
+    responseFunc(errors.join(", "), null);
+  else {
+    //If validated
+    users.registerUser(data.username, data.password, responseFunc);
+  }
 });
 
 /*
@@ -68,19 +81,36 @@ app.post("/login/extension/", function(req, res){
   var data = req.body;
   console.log("Extensions Login ", data);
 
+  var responseFunc = utils.sendUserAuthResponse(res);
+  var errors = [];
+
+  if(!data.username)
+    errors.push("Username cannot be empty");
+
+  if(!data.password)
+    errors.push("Password cannot be empty");
+
+  if(!data.device_name)
+    errors.push("Device Name cannot be empty");
+
+  if(errors.length > 0)
+    responseFunc(errors.join(", "), null);
+
+  else {
   //verify user credentials
-  users.login(data.username, data.password , function(error, doc){
-    if (error) {
-      res.contentType('application/json');
-      res.send({"success":false, "error": error});
-    }
-    else{
-      //Find or add a new device with the provided device name. Respond with the
-      //device id of the device from the device table
-      users.findOrAddDevice(doc, data.device_name,
-			   utils.sendUserAuthResponse(res));
-    }
-  });
+    users.login(data.username, data.password , function(error, doc){
+      if (error) {
+  	res.contentType('application/json');
+  	res.send({"success":false, "error": error});
+      }
+      else{
+  	//Find or add a new device with the provided device name. Respond with the
+  	//device id of the device from the device table
+  	users.findOrAddDevice(doc, data.device_name,
+  			       utils.sendUserAuthResponse(res));
+      }
+    });
+  }
 });
 
 /*
@@ -89,16 +119,35 @@ A post request to login user from the mobile app
 app.post('/login/mobile', function(req, res){
   var data = req.body;
   console.log("Extensions Login ", data);
-  //verify user credentials
-  users.login(data.username, data.password , function(error, doc){
-    res.contentType('application/json');
-    if (error) {
-      res.send({"success":false, "error": error});
-    }
-    else{
-      res.send({"success":true, "response": {user_id: doc._id} });
-    }
-  });
+
+  var data = req.body;
+  console.log("Registeration Request", data);
+  var responseFunc = utils.sendUserAuthResponse(res);
+  var errors = "";
+
+  var errors = [];
+
+  if(!data.username)
+    errors.push("Username cannot be empty");
+
+  if(!data.password)
+    errors.push("Password cannot be empty");
+
+  if(errors.length > 0)
+    responseFunc(errors.join(", "), null);
+
+  else {
+    //verify user credentials
+    users.login(data.username, data.password , function(error, doc){
+      res.contentType('application/json');
+      if (error) {
+	res.send({"success":false, "error": error});
+      }
+      else{
+	res.send({"success":true, "response": {user_id: doc._id} });
+      }
+    });
+  }
 });
 
 /*
