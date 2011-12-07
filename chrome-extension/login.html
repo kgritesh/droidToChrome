@@ -78,7 +78,9 @@
    }
 
    var paramJSON = '{ "username":"'+userName+'","password":"'+password+'","device_name":"'+deviceName+'"}';
-   xhr.open("POST", ipaddress, true);
+   var login_url = ipaddress + "/login/extension/";
+   alert(login_url);
+   xhr.open("POST", login_url, true);
    xhr.setRequestHeader("Content-type", "application/json");
    xhr.onreadystatechange=function()
   {
@@ -104,7 +106,7 @@
     else
      {
         document.getElementById("status_message").innerHTML="U are having problem connecting to server";
-          document.getElementById("status_message").style.visibility="visible";
+        document.getElementById("status_message").style.visibility="visible";
      }
   }
 xhr.send(paramJSON);

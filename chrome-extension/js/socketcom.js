@@ -1,4 +1,4 @@
-var ipaddress = "http://192.168.43.248:3000";
+var ipaddress = "http://localhost:3000";
 function run(){
   var bkg = chrome.extension.getBackgroundPage();
   try
