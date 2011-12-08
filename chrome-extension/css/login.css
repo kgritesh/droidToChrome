@@ -1,11 +1,72 @@
 .status_message
 {
-background-color:yellow;
-text-align:center;
+    background-color:yellow;
+    text-align:center;
 }
+
 input.text
 {
-  display: block;
+    display: block;
     margin-left: auto;
     margin-right: auto
 }
+
+body{
+    font-family:Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+.content, .contentA{
+    padding:70px;
+    width:370px
+}
+
+.left{
+    width:150px;
+    float:left;
+    padding:7px 0px 0px 7px;
+    min-height:24px;
+}
+.right{
+    width:200px;
+    float:left;
+    padding:5px;
+    min-height:24px;
+}
+.clear{
+    float:none;
+    clear:both;
+    height:0px;
+}
+
+.row{
+    background-color:none;
+    display:block;
+    min-height:32px;
+}
+
+.text{
+    width:190px;
+}
+
+img.left{
+    position : absolute;
+    left :-30px;
+    width: 150px;
+    top:20px;
+}
+
+img.right{
+    position : absolute;
+    top : 0px;
+    left : 400px;
+}
+
+.title
+{
+  font-size: 30px;
+  position : absolute;
+  text-align : center;
+  top : 10 px;
+  left : 130px;
+}
+

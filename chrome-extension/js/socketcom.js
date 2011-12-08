@@ -1,5 +1,4 @@
-var ipaddress = "http://localhost:3000";
-function run(){
+function initsockets(){
   var bkg = chrome.extension.getBackgroundPage();
   try
     {
@@ -10,7 +9,7 @@ function run(){
 			       {'reconnect': true,
 				'reconnection delay': 500,
 				'max reconnection attempts': 10,
-				port: 8080 });
+				port: portnumber });
 	socket.emit('auth', {"uuid":uuid});
 	socket.on('urls', function (data) {
 	  console.log(data);

@@ -1,23 +1,12 @@
 <html>
-<head>
-<script src="socket.io.js"></script>
-<script type="text/javascript" src="js/socketcom.js"></script>
-<script type="text/javascript">
-  function init()
-   {
-    if (localStorage.getItem('first_run'))
-    {
-      run();
-      return;
-    }
-    localStorage.setItem('first_run', 'true');
-    chrome.tabs.create({url: "login.html"});
-  }
- init();
-</script>
-</head>
-<body>
-</body>
+  <head>
+    <script type="text/javascript" src="js/lib/jquery-1.6.1.min.js"></script>
+    <script type="text/javascript" src="js/lib/socket.io.js"></script>
+    <script type="text/javascript" src="js/socketcom.js"></script>
+    <script type="text/javascript" src="js/init.js"></script>
+  </head>
+  <body>
+  </body>
 </html>
 
 

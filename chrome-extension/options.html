@@ -1,63 +1,19 @@
 <html>
-<head>
-<style>
-div.green
-{
-background-color: green;
-padding:10px;
-position : abosulte;
-top : 20px;
-width:370px;
-text-align : center;
-}
-div.red
-{
-background-color: red;
-padding:10px;
-width:370px;
-top : 20px;
-text-align : center;
-}
+  <head>
+    <link rel="stylesheet" type="text/css" href="css/options.css" />
+    <script src="js/lib/socket.io.js"></script>
+    <script type="text/javascript" src="js/lib/jquery-1.6.1.min.js"></script>
+    <script type="text/javascript" src="js/socketcom.js"></script>
+    <script type="text/javascript" src="js/init.js"></script>
+    <script type="text/javascript" src="js/options.js"></script>
 
-</style>
- <script type="text/javascript">
-  function logoutAndClear()
-    {
-      window.localStorage.removeItem('uuid');
-      document.location="login.html";
-     }
-    function login()
-    {
-      document.location="login.html";
-   }
-</script>
-</head>
-<body>
- <div class="red" id="logout_div"  style="visibility:hidden"  onclick='logoutAndClear()' ><a href="#"    id="logout_button" ><span>Logout</span> </a></div>
- <div class="green"id="login_div" style="visibility:hidden"  onclick='login()' > <a href="#"  id="login_button" name="login_button"  > <span>Login</span></a></div>
-</form>
- <script type="text/javascript">
- try
-{  
-var uuid = window.localStorage.getItem('uuid');
-console.log(uuid);
-if(uuid===null)
- {
-   document.location="login.html";
- }
-else
-{
-document.getElementById('logout_div').style.visibility='visible';
- }
-}
-catch(e)
-{
- document.getElementById('login_div').style.visibility='visible';
-document.getElementById('logout_div').style.visibility='hidden';
- console.log(e);
-}
-
-</script>
-
-</body>
+  </head>
+  <body>
+    <div class="red hidden" id="logout_div" >
+      <a href="#"    id="logout_button" ><span>Logout</span> </a>
+    </div>
+    <div class="green hidden" id="login_div">
+      <a href="#"  id="login_button" name="login_button"  > <span>Login</span></a>
+    </div>
+  </body>
 </html>
